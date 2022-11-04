@@ -1,0 +1,33 @@
+中阿翻译模型源码 by Iscolito
+起始文件区结构如下:
+isot -|
+	  |--start.sh	快速初始化脚本
+	  |--README		isot说明
+	  |--src -|		源翻译资源库
+			  |--ar_zh.ar	中阿翻译阿语
+			  |--ar_zh.zh	中阿翻译中文
+			  |--ar_zh.test		中阿翻译测试集
+			  |--zh_ar.ar	阿中翻译阿语
+			  |--zh_ar.zh	阿中翻译中文
+			  |--zh_ar.test		阿中翻译测试集
+	  |--process_1 -|	预处理，依赖mosesdecoder和subword-nmt
+					|--pre_extends.sh	平行语料下载与初步处理
+					|--pre_run_ar_zh.sh		阿中预处理
+					|--pre_run_zh_ar.sh		中阿预处理
+				    |--rescources	训练集和验证集原文件
+				    |--results		预处理结果
+					|--extends -|		平行语料扩展包
+								|--README 	扩展包下载地址
+				    |--pre_ar -|	阿语标准化处理包
+							   |--main.py		标准化批处理
+							   |--pre_extends.py	下载并初步处理原始语料
+							   |--test.py		标准化单句处理
+	  |--generate_1 -|		模型训练
+					 |--models		生成模型存放区
+					 |--rescources		预处理结果存放区
+					 |--results		测试集翻译结果存放区
+					 |--tests		测试集存放区
+					 |--startup_ar_zh.sh	阿中模型训练
+					 |--startup_zh_ar.sh	中阿模型训练
+					 |--decoding_ar_zh.sh	阿中模型解码
+					 |--decoding_zh_ar.sh	中阿模型解码
