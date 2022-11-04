@@ -19,12 +19,13 @@ until
 		echo "7.阿译中预处理"
 		echo "8.中译阿资源准备"
 		echo "9.中译阿预处理"
-		echo "10.退出菜单"
+		echo "10.清除缓存"
+		echo "11.退出菜单"
 		echo ---------------------------------
 		echo	      mod by Iscolito
 		echo =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 		read input
-		test $input = 10
+		test $input = 11
 		do
 			case $input in
 			1)ls $pre/$ex
@@ -77,6 +78,8 @@ until
 			  bash pre_run_zh_ar.sh
 			  cd ..;;
 			
-			10)echo "请输入选择（1-9）"
+			10)rm -rf $pre/$res/tmp;;
+			
+			11)echo "请输入选择（1-11）"
 			esac
 			done
