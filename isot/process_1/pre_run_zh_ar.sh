@@ -72,9 +72,9 @@ for itype in train valid; do
 		echo ""
 	done
 	perl $CLEAN -ratio 1.5 $tmp/$itype.$lang.tok $src $tgt $tmp/$itype.$lang.clean 1 175
-	#此处暂不使用clean的结果
+	#使用clean的结果
 	for l in $src $tgt; do
-		perl $LC < $tmp/$itype.$lang.tok.$l > $tmp/$itype.$lang.$l
+		perl $LC < $tmp/$itype.$lang.clean.$l > $tmp/$itype.$lang.$l
 	done
 done
 

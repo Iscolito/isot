@@ -1,0 +1,1 @@
+wget https://object.pouta.csc.fi/OPUS-UNPC/v1.0/moses/ar-zh.txt.zip

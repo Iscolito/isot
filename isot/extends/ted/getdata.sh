@@ -1,0 +1,1 @@
+wget https://object.pouta.csc.fi/OPUS-TED2020/v1/moses/ar-zh_cn.txt.zip

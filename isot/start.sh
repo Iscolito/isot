@@ -7,6 +7,8 @@ ex=extends
 reset=reset.sh
 src=src
 trans=trans.sh
+logpath=$gen/Fairseq_Data-transformer
+best=best_one
 
 until
 		echo =-=-=-=-=选择进行的操作=-=-=-=-=
@@ -20,12 +22,15 @@ until
 		echo "8.中译阿资源准备"
 		echo "9.中译阿预处理"
 		echo "10.清除缓存"
-		echo "11.退出菜单"
+		echo "11.配置可视化窗口"
+		echo "12.打开可视化面板"	
+		echo "13.导出最优模型和训练数据"		
+		echo "14.退出菜单"
 		echo ---------------------------------
 		echo	      mod by Iscolito
 		echo =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 		read input
-		test $input = 11
+		test $input = 14
 		do
 			case $input in
 			1)ls $pre/$ex
@@ -80,6 +85,17 @@ until
 			
 			10)rm -rf $pre/$res/tmp;;
 			
-			11)echo "请输入选择（1-11）"
+			11)git clone https://github.com/noe/fairseq-tensorboard.git "$gen/fairseq-tensorboard";;
+			
+			12)tensorboard --logdir=$logpath
+			   echo 已打开至http://localhost:6006/
+			   echo;;
+			   
+			13)cp -r $gen/$orig/data-bin $best/$orig
+			   cp $gen/models/checkpoints/checkpoint_best.pt $best/models/checkpoints
+			   cp $gen/nohup.out $best
+			   cp -r $gen/Fairseq_Data-transformer $best;;
+			
+			14)echo "请输入选择（1-14）"
 			esac
 			done

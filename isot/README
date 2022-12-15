@@ -1,5 +1,5 @@
-中阿翻译模型源码 by Iscolito
-起始文件区结构如下:
+中阿翻译模型源码说明 by Iscolito
+1.起始文件区结构如下:
 isot -|
 	  |--start.sh	快速初始化脚本
 	  |--README		isot说明
@@ -14,20 +14,72 @@ isot -|
 					|--pre_extends.sh	平行语料下载与初步处理
 					|--pre_run_ar_zh.sh		阿中预处理
 					|--pre_run_zh_ar.sh		中阿预处理
+					|--pre_test_ar_zh.sh	阿中测试集预处理
+					|--pre_test_zh_ar.sh	中阿测试集预处理
 				    |--rescources	训练集和验证集原文件
 				    |--results		预处理结果
+					|--tests	测试集预处理
+					|--dicts	字典存放区
 					|--extends -|		平行语料扩展包
 								|--README 	扩展包下载地址
 				    |--pre_ar -|	阿语标准化处理包
-							   |--main.py		标准化批处理
+							   |--main.py		阿语标准化批处理
 							   |--pre_extends.py	下载并初步处理原始语料
-							   |--test.py		标准化单句处理
+							   |--test.py		阿语标准化单句处理
+							   |--dict_test.py		生成目标数据集的阿语词典
+							   |--get_json.py		处理爬取的json文件
 	  |--generate_1 -|		模型训练
+					-|--Fairseq_Data-transformer	tensorboard数据存放区
 					 |--models		生成模型存放区
 					 |--rescources		预处理结果存放区
 					 |--results		测试集翻译结果存放区
 					 |--tests		测试集存放区
-					 |--startup_ar_zh.sh	阿中模型训练
-					 |--startup_zh_ar.sh	中阿模型训练
-					 |--decoding_ar_zh.sh	阿中模型解码
-					 |--decoding_zh_ar.sh	中阿模型解码
+					 |--binary.sh	词典生成与二值化
+					 |--training.sh	模型训练
+					 |--decoding.sh	模型解码
+	  |--extends	-|		扩展语料
+					-|--main -| 	主体扩展语料
+							  |--getdata.sh	数据下载
+					-|--ted 	ted扩展字典语料
+							  |--getdata.sh	数据下载
+					-|--back	back translate生成的含噪语料
+					-|--parallel 	自购扩展字典语料
+	  |--models		-|		预训练模型
+					 |--deltalm		deltalm预训练模型
+							  |----以下均为deltalm github源码----|
+							  |--deltalm
+							  |--generate.py
+							  |--interactive.py
+							  |--preprocess.py
+							  |--train.py
+							  |----以上均为deltalm github源码----|
+							  |--dict		源码字典库存放区
+							  |--models		微调模型存放区
+							  |--pretrained		预训练模型存放区
+							  |--resources		预处理后的模型存放区
+							  |--results	结果存放区
+							  |--tests		训练集存放区
+							  |--decoding.sh	模型解码
+							  |--finetune.sh	模型微调
+							  
+2.isot的环境说明
+isot支持Ubuntu16.04-20.04版本的系统环境，python>=3.8，依赖库:scaresmoses、jieba、fairseq(手动编译)、numpy(23.04)、torch(与CUDA版本相对应)、tensorboard、tensorboardX、apex(c++编译版)、hazm
+系统预装gcc和与显卡版本对应的CUDA(不低于10.1)、硬件方面显卡显存不低于6G
+
+3.操作说明
+①语料获取：使用extends中的脚本进行扩展语料下载，复制入process_1/extends中，调用process_1/pre_ar中的pre_extends.py文件进行语料去重降噪筛选等操作，具体筛选句数可以通过修改脚本改变。之后使用dict_test.py检测语料字典大小情况，分析语料是否覆盖足够多的阿语词汇。
+②预处理：预处理时，将双语平行语料对应复制到process_1/resources里面,自行分割出验证集，分别命名为valid.zh、valid.ar、train.zh、train.ar，根据所选翻译方向调用pre_run_xx_xx.sh进行预处理工作（为了方便将中阿、阿中脚本复制为两个，实际应用中可以通过修改全局变量来实现）,再调用pre_test_xx_xx.sh进行同一BPE CODE下的测试集预处理。
+③二值化: 将产生的valid.zh、valid.ar、train.zh、train.ar复制到generate_1/resources中，调用binary.sh进行二值化。（根据翻译方向修改全局变量）
+④训练：根据预处理后的句对数量：
+当平行语料<=100w行，将generate_1/rescources/data-bin复制入models/deltalm/resources中，在models/deltalm/pretrained文件夹下载https://github.com/microsoft/unilm/blob/master/deltalm/ 中对应的预训练模型，调用finetune.sh进行模型微调
+当平行语料句数>=100w行，调用training.sh进行模型训练，在generate_1文件夹中使用命令tensorboard --logdir=Fairseq_Data-transformer将训练数据图像绘制在web上并监听6006端口
+⑤解码：将process_1/tests/results中的xx_xx.test复制到训练文件夹下的tests文件夹中，调用父文件夹的decoding.sh进行解码
+⑥back translate：使用初步生成的模型，对单语言语料按照测试集的方式预处理和解码，将生成了含噪双语语料复制到extends/back中为下一轮训练备用
+
+4.文献引用
+	1. Attention is all you need. arXiv:1706.03762 [cs.CL]. https://doi.org/10.48550/arXiv.1706.03762
+	2. Scaling Neural Machine Translation. arXiv:1806.00187v3 [cs.CL]. https://doi.org/10.48550/arXiv.1806.00187
+	3. DeltaLM: Encoder-Decoder Pre-training for Language Generation and Translation by Augmenting Pretrained Multilingual Encoders. 	arXiv:2106.13736 [cs.CL]. https://doi.org/10.48550/arXiv.2106.13736
+
+
+
